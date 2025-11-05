@@ -1,13 +1,8 @@
-import dynamic from 'next/dynamic';
+'use client';
+import { useUser } from '@/context/UserContext';
+import Link from 'next/link';
 
-const SavedItemsClient = dynamic(
-  () => import('@/components/SavedItemsClient'),
-  { ssr: false }
-);
-
-export default function SavedPage() {
-  return <SavedItemsClient />;
-}
+export default function SavedItemsClient() {
   const { savedItems, removeItem } = useUser();
 
   return (
