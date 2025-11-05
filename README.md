@@ -13,6 +13,36 @@ pnpm dev
 # or
 bun dev
 ```
+ 
+Live match data
+----------------
+
+The site includes a server-side helper to fetch live match data from Football-Data.org when a
+`FOOTBALL_DATA_API_KEY` environment variable is set. If no key is provided, the site falls back to the
+static placeholder matches in `src/components/MatchCard.tsx`.
+
+To enable live matches on Vercel:
+
+1. Get a free API key from https://www.football-data.org/ (register and copy your X-Auth-Token).
+2. In your Vercel project settings, add an environment variable named `FOOTBALL_DATA_API_KEY` with that token.
+3. Push a commit or re-deploy; the server will fetch scheduled matches for the Premier League and show them.
+
+Notes:
+- The helper queries the Premier League endpoint by default. Change `src/lib/football.ts` to query another competition if needed.
+- Keep your API key private — don't commit it to the repo.
+
+Live news
+---------
+
+The site can fetch live news using the NewsAPI.org endpoint. To enable live news:
+
+1. Get an API key from https://newsapi.org/ (register and copy your API key).
+2. In your Vercel project settings, add an environment variable named `NEWS_API_KEY` with that token.
+3. Push a commit or re-deploy; the server will then fetch recent articles mentioning "Manchester United" and display them on the homepage.
+
+Notes:
+- If no API key is provided, the site falls back to the static items in `src/components/NewsCard.tsx`.
+- The query is currently fixed to "Manchester United" — update `src/lib/news.ts` if you want a different search term or broader coverage.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 

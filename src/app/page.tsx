@@ -1,7 +1,13 @@
-﻿import { MatchCard, upcomingMatches } from '@/components/MatchCard'
-import { NewsCard, latestNews } from '@/components/NewsCard'
+﻿import { MatchCard } from '@/components/MatchCard'
+import { NewsCard } from '@/components/NewsCard'
+import { getUpcomingMatches } from '@/lib/football'
+import { getLatestNews } from '@/lib/news'
 
-export default function Home() {
+export default async function Home() {
+  // Server-side: try to fetch live matches and live news; helpers fall back to static data.
+  const upcomingMatches = await getUpcomingMatches()
+  const latestNews = await getLatestNews()
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-50 to-white dark:from-gray-900 dark:to-gray-800">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
