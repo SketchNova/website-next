@@ -1,4 +1,7 @@
-﻿interface NewsCardProps {
+﻿'use client';
+import { useState } from 'react';
+
+interface NewsCardProps {
   title: string;
   excerpt: string;
   image: string;
@@ -7,9 +10,6 @@
   url?: string;
   content?: string;
 }
-
-'use client';
-import { useState } from 'react';
 
 export const latestNews: NewsCardProps[] = [
   {
