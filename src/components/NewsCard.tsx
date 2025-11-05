@@ -1,5 +1,6 @@
 ﻿'use client';
 import { useState } from 'react';
+import { useUser } from '@/context/UserContext';
 
 interface NewsCardProps {
   title: string;
@@ -37,9 +38,46 @@ export const latestNews: NewsCardProps[] = [
 
 export function NewsCard({ title, excerpt, image, date, category, url, content }: NewsCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showShareTooltip, setShowShareTooltip] = useState(false);
+  const { saveItem, removeItem, hasItem } = useUser();
+  
+  const articleId = btoa(title).slice(0, 12); // Create a stable ID from the title
+  const isSaved = hasItem(articleId);
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: title,
+          text: excerpt,
+          url: url || window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(url || window.location.href);
+        setShowShareTooltip(true);
+        setTimeout(() => setShowShareTooltip(false), 2000);
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
+  const toggleSave = () => {
+    if (isSaved) {
+      removeItem(articleId);
+    } else {
+      saveItem({
+        id: articleId,
+        type: 'article',
+        title,
+        date,
+        url,
+      });
+    }
   };
 
   return (
@@ -93,14 +131,47 @@ export function NewsCard({ title, excerpt, image, date, category, url, content }
           </button>
         )}
         {url && (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 block text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-500 text-sm transition-colors"
-          >
-            Read Full Article →
-          </a>
+          <div className="mt-4 flex items-center justify-between">
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-500 text-sm transition-colors"
+            >
+              Read Full Article →
+            </a>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handleShare}
+                className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors relative"
+                aria-label="Share article"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                </svg>
+                {showShareTooltip && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap">
+                    Link copied!
+                  </div>
+                )}
+              </button>
+              <button
+                onClick={toggleSave}
+                className={`text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors ${
+                  isSaved ? 'text-red-600 dark:text-red-400' : ''
+                }`}
+                aria-label={isSaved ? 'Remove from saved' : 'Save article'}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d={
+                    isSaved
+                      ? "M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"
+                      : "M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4zm2-1a1 1 0 00-1 1v12.566l4 2 4-2V4a1 1 0 00-1-1H7z"
+                  } />
+                </svg>
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>
