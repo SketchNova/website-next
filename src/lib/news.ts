@@ -52,10 +52,12 @@ export async function getLatestNews(): Promise<News[]> {
         : 'TBD';
       return {
         title: a.title || 'No title',
-        excerpt: a.description || a.content || '',
+        excerpt: a.description || a.content?.slice(0, 150) || '',
+        content: a.content || a.description || '',
         image: a.urlToImage || '',
         date,
         category: a.source?.name || 'News',
+        url: a.url || '',
       } as News;
     });
 
